@@ -146,22 +146,6 @@ require('lazy').setup({
     },
   },
 
-  -- {
-  -- Theme inspired by Atom
-  --  'navarasu/onedark.nvim',
-  --  priority = 1000,
-  --  config = function()
-  --    vim.cmd.colorscheme 'onedark'
-  --  end,
-  --},
-
-  {
-    'rebelot/kanagawa.nvim',
-    priority = 1000,
-    config = function()
-      vim.cmd("colorscheme kanagawa-dragon")
-    end,
-  },
 
   {
     -- Set lualine as statusline
@@ -233,6 +217,8 @@ require('lazy').setup({
 
   require 'kickstart.plugins.autoformat',
   -- require 'kickstart.plugins.debug',
+
+  require 'alvin.colorscheme',
 
   { import = 'plugins' },
 }, {})
