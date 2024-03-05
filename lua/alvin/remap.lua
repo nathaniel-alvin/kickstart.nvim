@@ -48,9 +48,15 @@ vim.keymap.set("n", "<leader><leader>", function()
 end)
 
 -- trouble.nvim
-vim.keymap.set("n", "<leader>xx", function() require("trouble").toggle() end)
-vim.keymap.set("n", "<leader>xw", function() require("trouble").toggle("workspace_diagnostics") end)
-vim.keymap.set("n", "<leader>xd", function() require("trouble").toggle("document_diagnostics") end)
-vim.keymap.set("n", "<leader>xq", function() require("trouble").toggle("quickfix") end)
-vim.keymap.set("n", "<leader>xl", function() require("trouble").toggle("loclist") end)
+vim.keymap.set("n", "<leader>xx", function() require("trouble").toggle() end, { desc = 'Open trouble list' })
+vim.keymap.set("n", "<leader>xw", function() require("trouble").toggle("workspace_diagnostics") end,
+    { desc = 'Open trouble workspace list' })
+vim.keymap.set("n", "<leader>xd", function() require("trouble").toggle("document_diagnostics") end,
+    { desc = 'Open trouble document list' })
+vim.keymap.set("n", "<leader>xn", function() require("trouble").next({ skip_groups = true, jump = true }) end,
+    { desc = 'Go to next diagnostic message' })
+vim.keymap.set("n", "<leader>xp", function() require("trouble").previous({ skip_groups = true, jump = true }) end,
+    { desc = 'Go to prev diagnostic message' })
+-- vim.keymap.set("n", "<leader>xq", function() require("trouble").toggle("quickfix") end, { desc = 'Open quickfix' })
+-- vim.keymap.set("n", "<leader>xl", function() require("trouble").toggle("loclist") end, { desc = 'Open trouble list' })
 vim.keymap.set("n", "gR", function() require("trouble").toggle("lsp_references") end)
