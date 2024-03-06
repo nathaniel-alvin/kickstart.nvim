@@ -554,10 +554,22 @@ capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp'
 local servers = {
   -- clangd = {},
   gopls = { filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' } },
+  templ = {},
   -- pyright = {},
   -- rust_analyzer = {},
+  -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
+  --
+  -- Some languages (like typescript) have entire language plugins that can be useful:
+  --    https://github.com/pmizio/typescript-tools.nvim
+  --
+  -- But for many setups, the LSP (`tsserver`) will work just fine
   -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
+  html = { filetypes = { 'html', 'tmpl', 'twig', 'hbs' } },
+  htmx = { filetypes = { 'html', 'tmpl' } },
+  tailwindcss = {
+    filetypes = { "templ", "astro", "javascript", "typescript", "react" },
+    init_options = { userLanguages = { templ = "html" } },
+  },
 
   -- lua_ls = {
   --   Lua = {
@@ -595,8 +607,6 @@ local servers = {
   },
 }
 
--- mason-lspconfig requires that these setup functions are called in this order
--- before setting up the servers.
 require('mason').setup()
 
 local ensure_installed = vim.tbl_keys(servers or {})
