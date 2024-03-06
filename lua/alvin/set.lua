@@ -6,11 +6,15 @@ vim.opt.guicursor = ""
 
 -- Set highlight on search
 vim.o.hlsearch = false
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.o.incsearch = true
 
 -- Make line numbers default
 vim.wo.number = true
 vim.opt.relativenumber = true
+
+-- Don't show the mode, since it's already in status line
+vim.opt.showmode = false
 
 -- Tabs
 vim.o.tabstop = 4
@@ -50,11 +54,24 @@ vim.o.timeoutlen = 300
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
 
+-- Sets how neovim will display certain whitespace in the editor.
+--  See `:help 'list'`
+--  and `:help 'listchars'`
+vim.opt.list = true
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+
+-- Preview substitutions live, as you type!
+vim.opt.inccommand = 'split'
+
+-- Show which line your cursor is on
+vim.opt.cursorline = true
+
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
-vim.opt.scrolloff = 8
+vim.opt.scrolloff = 10
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
+vim.opt.colorcolumn = "120"
 vim.opt.colorcolumn = "120"
