@@ -4,12 +4,7 @@
 
 vim.opt.guicursor = ""
 
--- Set highlight on search
-vim.o.hlsearch = false
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-vim.o.incsearch = true
-
--- Make line numbers default
+-- Make relative line numbers default
 vim.wo.number = true
 vim.opt.relativenumber = true
 
@@ -22,9 +17,19 @@ vim.o.softtabstop = 4
 vim.o.shiftround = 4
 vim.o.expandtab = true
 
+-- Enable auto indenting and set it to spaces
 vim.o.smartindent = true
+vim.o.shiftwidth = 4
 
+-- Enable break indent (smart indenting) https://stackoverflow.com/questions/1204149/smart-wrap-in-vim
+vim.o.breakindent = true
+
+-- Disable text wrap
 vim.o.wrap = false
+
+-- Better splitting
+vim.o.splitbelow = true
+vim.o.splitright = true
 
 -- Enable mouse mode
 vim.o.mouse = 'a'
@@ -32,13 +37,15 @@ vim.o.mouse = 'a'
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.o.clipboard = 'unnamedplus'
-
--- Enable break indent
-vim.o.breakindent = true
+vim.o.clipboard = "unnamed,unnamedplus"
 
 -- Save undo history
 vim.o.undofile = true
+
+-- Set highlight on search and incremental searching
+vim.o.hlsearch = false
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+vim.o.incsearch = true
 
 -- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
@@ -52,7 +59,7 @@ vim.o.updatetime = 250
 vim.o.timeoutlen = 300
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
+vim.opt.completeopt = { "menuone", "noselect" }
 
 -- Sets how neovim will display certain whitespace in the editor.
 --  See `:help 'list'`
@@ -73,5 +80,4 @@ vim.opt.scrolloff = 10
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
-vim.opt.colorcolumn = "120"
 vim.opt.colorcolumn = "120"

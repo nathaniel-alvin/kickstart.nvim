@@ -2,11 +2,21 @@ return {
   {
     'rebelot/kanagawa.nvim',
     priority = 1000,
-    config = function()
-      vim.cmd("colorscheme kanagawa-dragon")
+    init = function()
+      vim.cmd.colorscheme 'kanagawa-dragon'
     end,
   },
 }
+-- {
+--   'ramojus/mellifluous.nvim',
+--   priority = 1000,
+--   init = function()
+--     require 'mellifluous'.setup({
+--       color_set = 'kanagawa_dragon'
+--     })
+--     vim.cmd.colorscheme 'mellifluous'
+--   end,
+-- }
 -- {
 -- Theme inspired by Atom
 --  'navarasu/onedark.nvim',
@@ -14,7 +24,7 @@ return {
 --  config = function()
 --    vim.cmd.colorscheme 'onedark'
 --  end,
---},
+-- },
 
 -- {
 --   'catppuccin/nvim',

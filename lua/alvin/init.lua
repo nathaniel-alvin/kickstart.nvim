@@ -49,25 +49,27 @@ require('lazy').setup({
       { 'j-hui/fidget.nvim',       opts = {} },
 
       -- Additional lua configuration, makes nvim stuff amazing!
-      'folke/neodev.nvim',
+      { 'folke/neodev.nvim',       opts = {} },
     },
   },
   { -- Autoformat
-    'stevear/conform.nvim',
+    'stevearc/conform.nvim',
+    event = "BufWritePre",
     opts = {
-      notify_on_error = false,
-      format_on_save = {
-        timeout_ms = 500,
-        ls_fallback = true,
-      },
       fomatters_by_ft = {
         lua = { 'stylua' },
+        go = { 'goimports', 'gofumpt' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
         -- javascript = { { "prettierd", "prettier" } },
+      },
+      notify_on_error = false,
+      format_on_save = {
+        timeout_ms = 500,
+        lsp_fallback = true,
       },
     },
   },
@@ -189,21 +191,6 @@ require('lazy').setup({
     },
   },
 
-
-  -- {
-  --   -- Set lualine as statusline
-  --   'nvim-lualine/lualine.nvim',
-  --   -- See `:help lualine.txt`
-  --   opts = {
-  --     options = {
-  --       icons_enabled = false,
-  --       theme = 'codedark',
-  --       component_separators = '|',
-  --       section_separators = '',
-  --     },
-  --   },
-  -- },
-
   {
     -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
@@ -250,16 +237,62 @@ require('lazy').setup({
   },
   {
     "folke/trouble.nvim",
+    -- branch = 'dev',
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = {
-    },
+    -- keys = {
+    --   { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>",              desc = "Diagnostics (Trouble)" },
+    --   { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
+    --   { "<leader>cs", "<cmd>Trouble symbols toggle focus=flse<cr>",       desc = "Symbols (Trouble)" },
+    --   {
+    --     "<leader>cS",
+    --     "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+    --     desc = "LSP references/definitions/... (Trouble)",
+    --   },
+    --   { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "Location List (Trouble)" },
+    --   { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>",  desc = "Quickfix List (Trouble)" },
+    -- },
   },
+
   -- {
-  --   "ggandor/leap.nvim",
-  --   config = function()
-  --     require('leap').create_default_mappings()
+  --   "ggandor/flit.nvim",
+  --   enabled = true,
+  --   keys = function()
+  --     ---type LazyKeys[]
+  --     local ret = {}
+  --
+  --     for _, key in ipairs({ "f", "F", "t", "T" }) do
+  --       ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
+  --     end
+  --
+  --     return ret
   --   end,
+  --   opts = { labeled_modes = "nx" },
   -- },
+
+  {
+    "ggandor/leap.nvim",
+    enabled = true,
+    keys = {
+      { "s",  mode = { "n", "x", "o" }, desc = "Leap Forward to" },
+      { "S",  mode = { "n", "x", "o" }, desc = "Leap Backward to" },
+      { "gs", mode = { "n", "x", "o" }, desc = "Leap from Windows" },
+    },
+    config = function(_, opts)
+      local leap = require("leap")
+      for k, v in pairs(opts) do
+        leap.opts[k] = v
+      end
+      leap.add_default_mappings(true)
+      vim.keymap.del({ "x", "o" }, "x")
+      vim.keymap.del({ "x", "o" }, "X")
+    end,
+  },
+
+  {
+    "tpope/vim-repeat",
+    event = "VeryLazy"
+  },
+
   {
     "folke/flash.nvim",
     event = "VeryLazy",
@@ -267,13 +300,14 @@ require('lazy').setup({
     opts = {},
     -- stylua: ignore
     keys = {
-      { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
+      -- { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
       { "S",     mode = { "n", "x", "o" }, function() require("flash").treesitter() end,        desc = "Flash Treesitter" },
       { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
       { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
       { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,            desc = "Toggle Flash Search" },
     },
   },
+
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
@@ -283,17 +317,27 @@ require('lazy').setup({
       --  - va)  - [V]isually select [A]round [)]paren
       --  - yinq - [Y]ank [I]nside [N]ext [']quote
       --  - ci'  - [C]hange [I]nside [']quote
-      require('mini.ai').setup { n_lines = 500 }
+      -- require('mini.ai').setup { n_lines = 500 }
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
       -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
-      -- require('mini.surround').setup()
+      require('mini.surround').setup {
+        mappings = {
+          add = "gza",            -- Add surrounding in Normal ad Visual modes
+          delete = "gzd",         -- Delete surrounding
+          find = "gzf",           -- Find surrounding (to the right)
+          find_left = "gzF",      -- Find surrounding (to the left)
+          highlight = "gzh",      -- Highlight surrounding
+          replace = "gzr",        -- Replace surrounding
+          update_n_lines = "gzn", -- Update `n_lines`
+        },
+      }
 
       -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
+      --  You could remove this setup call i don't like it,
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
       statusline.setup()
@@ -328,6 +372,14 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 
 -- Diagnostic keymaps
 -- look in keymaps
+
+-- -- [[ Format on save using conform ]]
+-- vim.api.nvim_create_autocmd("BufWritePre", {
+--   pattern = "*",
+--   callback = function(args)
+--     require("conform").format({ bufnr = args.buf })
+--   end,
+-- })
 
 -- [[ Highlight on yank ]]
 --  Highlight when yanking text
@@ -571,7 +623,46 @@ capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp'
 --  define the property 'filetypes' to the map in question.
 local servers = {
   -- clangd = {},
-  gopls = { filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' } },
+  gopls = {
+    filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
+    settings = {
+      gopls = {
+        gofumpt = true,
+        codelenses = {
+          gc_details = false,
+          generate = true,
+          regenerate_cgo = true,
+          run_govulncheck = true,
+          test = true,
+          tidy = true,
+          upgrade_dependency = true,
+          vendor = true,
+        },
+        -- hints = {
+        --   assignVariableTypes = true,
+        --   compositeLiteralFields = true,
+        --   compositeLiteralTypes = true,
+        --   constantValues = true,
+        --   functionTypeParameters = true,
+        --   parameterNames = true,
+        --   rangeVariableTypes = true,
+        -- },
+        analyses = {
+          fieldalignment = true,
+          nilness = true,
+          unusedparams = true,
+          unusedwrite = true,
+          useany = true,
+        },
+        -- usePlaceholders = true,
+        completeUnimported = true,
+        staticcheck = true,
+        directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
+        semanticTokens = true,
+      },
+    },
+  },
+
   templ = {},
   -- pyright = {},
   -- rust_analyzer = {},
@@ -603,18 +694,6 @@ local servers = {
     -- capabilities = {},
     settings = {
       Lua = {
-        runtime = { version = 'LuaJIT' },
-        workspace = {
-          checkThirdParty = false,
-          -- Tells lua_ls where to find all the Lua files that you have loaded
-          -- for your neovim configuration.
-          library = {
-            '${3rd}/luv/library',
-            unpack(vim.api.nvim_get_runtime_file('', true)),
-          },
-          -- If lua_ls is really slow on your computer, you can try this instead:
-          -- library = { vim.env.VIMRUNTIME },
-        },
         completion = {
           callSnippet = 'Replace',
         },
@@ -630,6 +709,10 @@ require('mason').setup()
 local ensure_installed = vim.tbl_keys(servers or {})
 vim.list_extend(ensure_installed, {
   'stylua', -- Used to format lua code
+  'goimports',
+  'gofumpt',
+  'gomodifytags',
+  'impl',
 })
 require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
