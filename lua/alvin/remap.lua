@@ -5,7 +5,8 @@
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- Remap to go to netrw
-vim.keymap.set('n', '<leader>lv', vim.cmd.Ex)
+-- vim.keymap.set('n', '<leader>lv', vim.cmd.Ex)
+vim.keymap.set('n', '<leader>lv', "<CMD>Oil<CR>", { desc = "Open parent directory" })
 
 vim.keymap.set('n', '<leader>v', '<C-v>')
 

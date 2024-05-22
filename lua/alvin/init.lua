@@ -77,8 +77,11 @@ require('lazy').setup({
     -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = {
+      -- Prettier icons
+      'onsails/lspkind.nvim',
+
       -- Snippet Engine & its associated nvim-cmp source
-      'L3MON4D3/LuaSnip',
+      { 'L3MON4D3/LuaSnip', build = "make install_jsregexp" },
       'saadparwaiz1/cmp_luasnip',
 
       -- Adds LSP completion capabilities
@@ -235,57 +238,11 @@ require('lazy').setup({
       'nvim-treesitter/nvim-treesitter-textobjects',
     },
   },
+
   {
     "folke/trouble.nvim",
-    -- branch = 'dev',
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    -- keys = {
-    --   { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>",              desc = "Diagnostics (Trouble)" },
-    --   { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
-    --   { "<leader>cs", "<cmd>Trouble symbols toggle focus=flse<cr>",       desc = "Symbols (Trouble)" },
-    --   {
-    --     "<leader>cS",
-    --     "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
-    --     desc = "LSP references/definitions/... (Trouble)",
-    --   },
-    --   { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "Location List (Trouble)" },
-    --   { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>",  desc = "Quickfix List (Trouble)" },
-    -- },
-  },
-
-  -- {
-  --   "ggandor/flit.nvim",
-  --   enabled = true,
-  --   keys = function()
-  --     ---type LazyKeys[]
-  --     local ret = {}
-  --
-  --     for _, key in ipairs({ "f", "F", "t", "T" }) do
-  --       ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
-  --     end
-  --
-  --     return ret
-  --   end,
-  --   opts = { labeled_modes = "nx" },
-  -- },
-
-  {
-    "ggandor/leap.nvim",
-    enabled = true,
-    keys = {
-      { "s",  mode = { "n", "x", "o" }, desc = "Leap Forward to" },
-      { "S",  mode = { "n", "x", "o" }, desc = "Leap Backward to" },
-      { "gs", mode = { "n", "x", "o" }, desc = "Leap from Windows" },
-    },
-    config = function(_, opts)
-      local leap = require("leap")
-      for k, v in pairs(opts) do
-        leap.opts[k] = v
-      end
-      leap.add_default_mappings(true)
-      vim.keymap.del({ "x", "o" }, "x")
-      vim.keymap.del({ "x", "o" }, "X")
-    end,
+    opts = {},
   },
 
   {
@@ -300,7 +257,7 @@ require('lazy').setup({
     opts = {},
     -- stylua: ignore
     keys = {
-      -- { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
+      { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
       { "S",     mode = { "n", "x", "o" }, function() require("flash").treesitter() end,        desc = "Flash Treesitter" },
       { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
       { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
@@ -311,34 +268,6 @@ require('lazy').setup({
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
-      -- Better Around/Inside textobjects
-      --
-      -- Examples:
-      --  - va)  - [V]isually select [A]round [)]paren
-      --  - yinq - [Y]ank [I]nside [N]ext [']quote
-      --  - ci'  - [C]hange [I]nside [']quote
-      -- require('mini.ai').setup { n_lines = 500 }
-
-      -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup {
-        mappings = {
-          add = "gza",            -- Add surrounding in Normal ad Visual modes
-          delete = "gzd",         -- Delete surrounding
-          find = "gzf",           -- Find surrounding (to the right)
-          find_left = "gzF",      -- Find surrounding (to the left)
-          highlight = "gzh",      -- Highlight surrounding
-          replace = "gzr",        -- Replace surrounding
-          update_n_lines = "gzn", -- Update `n_lines`
-        },
-      }
-
-      -- Simple and easy statusline.
-      --  You could remove this setup call i don't like it,
-      --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
       statusline.setup()
 
@@ -349,12 +278,21 @@ require('lazy').setup({
       statusline.section_location = function()
         return '%2l:%-2v'
       end
-
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
     end,
   },
-
+  {
+    'stevearc/oil.nvim',
+    opts = {},
+    -- Optional dependencies
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      require("oil").setup({
+        view_options = {
+          show_hidden = true,
+        }
+      })
+    end,
+  },
   -- require 'kickstart.plugins.autoformat',
   -- require 'kickstart.plugins.debug',
 
@@ -756,6 +694,8 @@ local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 require('luasnip.loaders.from_vscode').lazy_load()
 luasnip.config.setup {}
+local lspkind = require 'lspkind'
+lspkind.init {}
 
 cmp.setup {
   snippet = {
@@ -767,37 +707,17 @@ cmp.setup {
     completeopt = 'menu,menuone,noinsert',
   },
   mapping = cmp.mapping.preset.insert {
-    -- ['<C-n>'] = cmp.mapping.select_next_item(),
-    -- ['<C-p>'] = cmp.mapping.select_prev_item(),
+    ['<C-n>'] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
+    ['<C-p>'] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete {},
-    ['<C-y>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Insert,
-      select = true
-    },
-    -- ['<CR>'] = cmp.mapping.confirm {
-    --   behavior = cmp.ConfirmBehavior.Replace,
-    --   select = true,
-    -- },
-    -- ['<Tab>'] = cmp.mapping(function(fallback)
-    --   if cmp.visible() then
-    --     cmp.select_next_item()
-    --   elseif luasnip.expand_or_locally_jumpable() then
-    --     luasnip.expand_or_jump()
-    --   else
-    --     fallback()
-    --   end
-    -- end, { 'i', 's' }),
-    -- ['<S-Tab>'] = cmp.mapping(function(fallback)
-    --   if cmp.visible() then
-    --     cmp.select_prev_item()
-    --   elseif luasnip.locally_jumpable(-1) then
-    --     luasnip.jump(-1)
-    --   else
-    --     fallback()
-    --   end
-    -- end, { 'i', 's' }),
+    ['<C-y>'] = cmp.mapping(
+      cmp.mapping.confirm {
+        behavior = cmp.ConfirmBehavior.Insert,
+        select = true,
+      },
+      { "i", "c" }
+    ),
   },
   sources = {
     { name = 'nvim_lsp' },
@@ -806,5 +726,18 @@ cmp.setup {
     { name = 'buffer',  keyword_length = 5 },
   },
 }
+
+vim.keymap.set({ 'i', 's' }, "<c-k>", function()
+  if luasnip.expand_or_jumpable() then
+    luasnip.expand_or_jump()
+  end
+end, { silent = true })
+
+vim.keymap.set({ 'i', 's' }, "<c-j>", function()
+  if luasnip.jumpable(-1) then
+    luasnip.jump(-1)
+  end
+end, { silent = true })
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
