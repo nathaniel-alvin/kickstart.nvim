@@ -45,26 +45,6 @@ require('lazy').setup({
     },
   },
 
-  {
-    -- Autocompletion
-    'hrsh7th/nvim-cmp',
-    dependencies = {
-      -- Prettier icons
-      'onsails/lspkind.nvim',
-
-      -- Snippet Engine & its associated nvim-cmp source
-      { 'L3MON4D3/LuaSnip', build = 'make install_jsregexp' },
-      'saadparwaiz1/cmp_luasnip',
-
-      -- Adds LSP completion capabilities
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-path',
-
-      -- Adds a number of user-friendly snippets
-      'rafamadriz/friendly-snippets',
-    },
-  },
-
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
@@ -344,15 +324,15 @@ local servers = {
           upgrade_dependency = true,
           vendor = true,
         },
-        -- hints = {
-        --   assignVariableTypes = true,
-        --   compositeLiteralFields = true,
-        --   compositeLiteralTypes = true,
-        --   constantValues = true,
-        --   functionTypeParameters = true,
-        --   parameterNames = true,
-        --   rangeVariableTypes = true,
-        -- },
+        hints = {
+          assignVariableTypes = true,
+          compositeLiteralFields = true,
+          compositeLiteralTypes = true,
+          constantValues = true,
+          functionTypeParameters = true,
+          parameterNames = true,
+          rangeVariableTypes = true,
+        },
         analyses = {
           fieldalignment = true,
           nilness = true,
@@ -360,7 +340,7 @@ local servers = {
           unusedwrite = true,
           useany = true,
         },
-        -- usePlaceholders = true,
+        usePlaceholders = true,
         completeUnimported = true,
         staticcheck = true,
         directoryFilters = { '-.git', '-.vscode', '-.idea', '-.vscode-test', '-node_modules' },
@@ -455,57 +435,6 @@ require('neodev').setup()
 --     }
 --   end,
 -- }
-
--- [[ Configure nvim-cmp ]]
--- See `:help cmp`
-local cmp = require 'cmp'
-local luasnip = require 'luasnip'
-require('luasnip.loaders.from_vscode').lazy_load()
-luasnip.config.setup {}
-local lspkind = require 'lspkind'
-lspkind.init {}
-
-cmp.setup {
-  snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
-  },
-  completion = {
-    completeopt = 'menu,menuone,noinsert',
-  },
-  mapping = cmp.mapping.preset.insert {
-    ['<C-n>'] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
-    ['<C-p>'] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
-    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-y>'] = cmp.mapping(
-      cmp.mapping.confirm {
-        behavior = cmp.ConfirmBehavior.Insert,
-        select = true,
-      },
-      { 'i', 'c' }
-    ),
-  },
-  sources = {
-    { name = 'nvim_lsp' },
-    { name = 'path' },
-    { name = 'luasnip' },
-    { name = 'buffer', keyword_length = 5 },
-  },
-}
-
-vim.keymap.set({ 'i', 's' }, '<c-k>', function()
-  if luasnip.expand_or_jumpable() then
-    luasnip.expand_or_jump()
-  end
-end, { silent = true })
-
-vim.keymap.set({ 'i', 's' }, '<c-j>', function()
-  if luasnip.jumpable(-1) then
-    luasnip.jump(-1)
-  end
-end, { silent = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
