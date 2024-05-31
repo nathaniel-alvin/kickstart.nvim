@@ -2,7 +2,7 @@
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
 
-vim.opt.guicursor = ""
+vim.opt.guicursor = ''
 
 -- Make relative line numbers default
 vim.wo.number = true
@@ -37,7 +37,7 @@ vim.o.mouse = 'a'
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.o.clipboard = "unnamed,unnamedplus"
+vim.o.clipboard = 'unnamed,unnamedplus'
 
 -- Save undo history
 vim.o.undofile = true
@@ -59,7 +59,7 @@ vim.o.updatetime = 250
 vim.o.timeoutlen = 300
 
 -- Set completeopt to have a better completion experience
-vim.opt.completeopt = { "menu", "menuone", "noselect" }
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 
 -- Sets how neovim will display certain whitespace in the editor.
 --  See `:help 'list'`
@@ -76,8 +76,8 @@ vim.opt.cursorline = true
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
-vim.opt.scrolloff = 10
-vim.opt.signcolumn = "yes"
-vim.opt.isfname:append("@-@")
+vim.opt.scrolloff = 5
+vim.opt.signcolumn = 'yes'
+vim.opt.isfname:append '@-@'
 
-vim.opt.colorcolumn = "120"
+vim.opt.colorcolumn = '150'
