@@ -14,7 +14,7 @@ vim.opt.showmode = false
 -- Tabs
 vim.o.tabstop = 4
 vim.o.softtabstop = 4
-vim.o.shiftround = 4
+-- vim.o.shiftround = 4
 vim.o.expandtab = true
 
 -- Enable auto indenting and set it to spaces
@@ -60,6 +60,7 @@ vim.o.timeoutlen = 300
 
 -- Set completeopt to have a better completion experience
 vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+vim.opt.shortmess:append 'c'
 
 -- Sets how neovim will display certain whitespace in the editor.
 --  See `:help 'list'`
@@ -81,3 +82,6 @@ vim.opt.signcolumn = 'yes'
 vim.opt.isfname:append '@-@'
 
 vim.opt.colorcolumn = '150'
+
+-- Don't have `o` add a comment
+vim.opt.formatoptions:remove 'o'

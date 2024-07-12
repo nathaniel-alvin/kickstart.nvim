@@ -39,7 +39,7 @@ vim.keymap.set('n', '<C-j>', '<cmd>cprev<CR>zz')
 vim.keymap.set('n', '<leader>k', '<cmd>lnext<CR>zz')
 vim.keymap.set('n', '<leader>j', '<cmd>lprev<CR>zz')
 
-vim.keymap.set('n', '<leader>s', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+vim.keymap.set('n', '<leader>rw', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = 'Search and Replace current word' })
 -- vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 
 vim.keymap.set('n', '<leader>mr', '<cmd>CellularAutomaton make_it_rain<CR>')
@@ -48,8 +48,30 @@ vim.keymap.set('n', '<leader><leader>', function()
   vim.cmd 'so'
 end)
 
+-- DIAGNOSTICS
+local diagnostic_goto = function(next, severity)
+  local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
+  severity = severity and vim.diagnostic.severity[severity] or nil
+  return function()
+    go { severity = severity }
+  end
+end
+vim.keymap.set('n', '<leader>cd', vim.diagnostic.open_float, { desc = 'Line Diagnostics' })
+vim.keymap.set('n', ']d', diagnostic_goto(true), { desc = 'Next Diagnostic' })
+vim.keymap.set('n', '[d', diagnostic_goto(false), { desc = 'Prev Diagnostic' })
+vim.keymap.set('n', ']e', diagnostic_goto(true, 'ERROR'), { desc = 'Next Error' })
+vim.keymap.set('n', '[e', diagnostic_goto(false, 'ERROR'), { desc = 'Prev Error' })
+vim.keymap.set('n', ']w', diagnostic_goto(true, 'WARN'), { desc = 'Next Warning' })
+vim.keymap.set('n', '[w', diagnostic_goto(false, 'WARN'), { desc = 'Prev Warning' })
+
 -- vim.keymap.set("n", "<leader>xq", function() require("trouble").toggle("quickfix") end)
 -- vim.keymap.set("n", "<leader>xl", function() require("trouble").toggle("loclist") end)
 vim.keymap.set('n', 'gR', function()
   require('trouble').toggle 'lsp_references'
 end)
+
+-- better up/down
+vim.keymap.set({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Down', expr = true, silent = true })
+vim.keymap.set({ 'n', 'x' }, '<Down>', "v:count == 0 ? 'gj' : 'j'", { desc = 'Down', expr = true, silent = true })
+vim.keymap.set({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Up', expr = true, silent = true })
+vim.keymap.set({ 'n', 'x' }, '<Up>', "v:count == 0 ? 'gk' : 'k'", { desc = 'Up', expr = true, silent = true })
