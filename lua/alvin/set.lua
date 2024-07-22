@@ -84,4 +84,9 @@ vim.opt.isfname:append '@-@'
 vim.opt.colorcolumn = '150'
 
 -- Don't have `o` add a comment
-vim.opt.formatoptions:remove 'o'
+vim.api.nvim_create_autocmd({ 'FileType' }, {
+  pattern = '*',
+  callback = function()
+    vim.opt.formatoptions:remove { 'o' }
+  end,
+})
