@@ -121,6 +121,12 @@ require('lazy').setup({
       miniai.setup()
     end,
   },
+
+  {
+    'b0o/SchemaStore.nvim',
+    lazy = true,
+    version = false, -- last release is way too old
+  },
   -- require 'kickstart.plugins.autoformat',
 
   { import = 'alvin.plugins' },
@@ -147,7 +153,23 @@ vim.defer_fn(function()
   ---@diagnostic disable-next-line: missing-fields
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash', 'markdown' },
+    ensure_installed = {
+      'c',
+      'cpp',
+      'go',
+      'lua',
+      'python',
+      'rust',
+      'tsx',
+      'javascript',
+      'typescript',
+      'vimdoc',
+      'vim',
+      'bash',
+      'markdown',
+      'dockerfile',
+      'json5',
+    },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = true,
