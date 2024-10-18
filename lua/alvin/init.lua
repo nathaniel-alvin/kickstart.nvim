@@ -40,30 +40,22 @@ require('lazy').setup({
     },
   },
 
-  -- Useful plugin to show you pending keybinds.
-  {
+  { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
-    event = 'VimEnter',
-    config = function()
+    event = 'VimEnter', -- Sets the loading event to 'VimEnter'
+    config = function() -- This is the function that runs, AFTER loading
       require('which-key').setup()
 
-      -- document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
-        ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-        -- ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+      -- Document existing key chains
+      require('which-key').add {
+        { '<leader>c', group = '[C]ode' },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>w', group = '[W]orkspace' },
+        { '<leader>t', group = '[T]oggle' },
+        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       }
-      -- register which-key VISUAL mode
-      -- required for visual <leader>hs (hunk stage) to work
-      require('which-key').register({
-        ['<leader>'] = { name = 'VISUAL <leader>' },
-        ['<leader>h'] = { 'Git [H]unk' },
-      }, { mode = 'v' })
     end,
   },
 
@@ -103,6 +95,30 @@ require('lazy').setup({
       { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
       { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
       { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,            desc = "Toggle Flash Search" },
+    },
+  },
+
+  {
+    'folke/todo-comments.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = {},
+    keys = {
+      {
+        ']t',
+        mode = { 'n' },
+        function()
+          require('todo-comments').jump_next()
+        end,
+        desc = 'Next todo comment',
+      },
+      {
+        '[t',
+        mode = { 'n' },
+        function()
+          require('todo-comments').jump_prev()
+        end,
+        desc = 'Previous todo comment',
+      },
     },
   },
 
@@ -156,9 +172,14 @@ vim.defer_fn(function()
     ensure_installed = {
       'c',
       'cpp',
+      'csv',
+      'dockerfile',
+      'gitignore',
       'go',
       'lua',
       'python',
+      'ninja',
+      'rst',
       'rust',
       'tsx',
       'javascript',
@@ -169,6 +190,9 @@ vim.defer_fn(function()
       'markdown',
       'dockerfile',
       'json5',
+      'php',
+      'sql',
+      'yaml',
     },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
@@ -188,7 +212,7 @@ vim.defer_fn(function()
     textobjects = {
       select = {
         enable = true,
-        lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+        lookahead = true,
         keymaps = {
           -- You can use the capture groups defined in textobjects.scm
           ['aa'] = '@parameter.outer',

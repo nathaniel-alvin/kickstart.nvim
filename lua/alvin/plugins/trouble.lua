@@ -32,8 +32,7 @@ return {
       desc = 'Quickfix List (Trouble)',
     },
   },
-  opts = {}, -- for default options, refer to the configuration section for custom setup.
-  config = {
+  opts = { -- for default options, refer to the configuration section for custom setup.
     focus = true,
     -- Create an autocommand that triggers on the BufRead and BufNewFile events for Trouble buffers
     vim.api.nvim_create_autocmd({ 'BufEnter', 'BufRead', 'BufNewFile' }, {

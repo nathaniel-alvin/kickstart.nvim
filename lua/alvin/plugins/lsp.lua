@@ -89,9 +89,9 @@ return {
       svelte = true,
       cssls = true,
       templ = true,
-      tsserver = {
-        enabled = false,
-      },
+      -- tsserver = {
+      --   enabled = false,
+      -- },
       vtsls = {
         -- explicitly add default filetypes, so that we can extend
         -- them in related extras
@@ -130,6 +130,7 @@ return {
           },
         },
       },
+      pyright = true,
       jsonls = {
         -- lazy-load schemastore when needed
         on_new_config = function(new_config)
@@ -177,8 +178,27 @@ return {
           },
         },
       },
+      emmet_ls = {
+        enabled = false,
+        filetypes = {
+          'html',
+          'typescriptreact',
+          'javascriptreact',
+          'css',
+          'sass',
+          'scss',
+          'less',
+          'svelte',
+        },
+      },
       dockerls = {},
       docker_compose_language_service = {},
+      phpactor = {
+        enabled = true,
+      },
+      intelephense = {
+        enabled = true,
+      },
     }
 
     local servers_to_install = vim.tbl_filter(function(key)
@@ -197,6 +217,8 @@ return {
       'delve',
       'prettier',
       'hadolint',
+      'phpcs',
+      'php-cs-fixer',
       -- "tailwind-language-server",
     }
 
@@ -211,8 +233,16 @@ return {
         capabilities = capabilities,
       }, config)
 
+      if name == 'tsserver' then
+        name = 'ts_ls'
+      end
       lspconfig[name].setup(config)
     end
+
+    -- example for further config for specific LSP
+    -- lspconfig.lua_ls.setup({
+    --   capabilities = capabilities,
+    -- })
 
     local disable_semantic_tokens = {
       lua = true,

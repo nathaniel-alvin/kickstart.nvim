@@ -7,7 +7,6 @@ return {
       function()
         require('conform').format { async = true, lsp_fallback = true }
       end,
-      mode = '',
       desc = '[F]ormat buffer',
     },
   },
@@ -18,20 +17,24 @@ return {
       -- have a well standardized coding style. You can add additional
       -- languages here or re-enable it for the disabled ones.
       local disable_filetypes = { c = true, cpp = true }
+      local lsp_format_opt
+      if disable_filetypes[vim.bo[bufnr].filetype] then
+        lsp_format_opt = 'never'
+      else
+        lsp_format_opt = 'fallback'
+      end
       return {
         timeout_ms = 500,
-        lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+        lsp_format = lsp_format_opt,
       }
     end,
     formatters_by_ft = {
       lua = { 'stylua' },
-      go = { { 'gofumpt', 'goimports' } },
+      go = { 'gofumpt', 'goimports', stop_after_first = true },
+      php = { 'php_cs_fixer' },
       -- Conform can also run multiple formatters sequentially
-      -- python = { "isort", "black" },
-      --
-      -- You can use a sub-list to tell conform to run *until* a formatter
-      -- is found.
-      -- javascript = { { "prettierd", "prettier" } },
+      python = { 'isort', 'black' },
+      javascript = { 'prettierd', 'prettier', stop_after_first = true },
     },
   },
 }

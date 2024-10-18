@@ -18,6 +18,12 @@ return {
   config = function()
     require('telescope').setup {
       defaults = {
+        file_ignore_patterns = {
+          '.git/',
+          '.next/',
+          '.svelte-kit/',
+          'node_modules/',
+        },
         mappings = {
           i = {
             ['<C-u>'] = false,
@@ -29,7 +35,6 @@ return {
       pickers = {
         find_files = {
           hidden = true,
-          no_ignore = true,
         },
       },
       extensions = {
