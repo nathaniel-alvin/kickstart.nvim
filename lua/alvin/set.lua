@@ -2,6 +2,9 @@
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
 
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+
 vim.opt.guicursor = ''
 
 -- Make relative line numbers default

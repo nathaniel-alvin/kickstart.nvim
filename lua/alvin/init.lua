@@ -1,22 +1,3 @@
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
-local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system {
-    'git',
-    'clone',
-    '--filter=blob:none',
-    'https://github.com/folke/lazy.nvim.git',
-    '--branch=stable', -- latest stable release
-    lazypath,
-  }
-end
-
--- Add lazy to the `runtimepath`, this allows us to `require` it.
----@diagnostic disable-next-line: undefined-field
-vim.opt.rtp:prepend(lazypath)
-
 -- [[ Configure plugins ]]
 require('lazy').setup({
 
@@ -57,19 +38,6 @@ require('lazy').setup({
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       }
     end,
-  },
-
-  -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
-
-  {
-    -- Highlight, edit, and navigate code
-    'nvim-treesitter/nvim-treesitter',
-    build = ':TSUpdate',
-    lazy = false,
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter-textobjects',
-    },
   },
 
   {
@@ -122,9 +90,12 @@ require('lazy').setup({
     },
   },
 
+  -- collection of mini.nvim
   {
     'echasnovski/mini.nvim',
+    version = false,
     config = function()
+      -- Mini statusline
       local statusline = require 'mini.statusline'
       statusline.setup()
 
@@ -132,9 +103,14 @@ require('lazy').setup({
       statusline.section_location = function()
         return '%2l:%-2v'
       end
+
       -- Mini ai
       local miniai = require 'mini.ai'
       miniai.setup()
+
+      -- Mini comment
+      local minicomment = require 'mini.comment'
+      minicomment.setup()
     end,
   },
 
@@ -148,7 +124,6 @@ require('lazy').setup({
   { import = 'alvin.plugins' },
 }, {})
 
-require 'alvin.set'
 require 'alvin.remap'
 
 -- [[ Highlight on yank ]]
@@ -161,100 +136,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
-
--- [[ Configure Treesitter ]]
--- See `:help nvim-treesitter`
--- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
-vim.defer_fn(function()
-  ---@diagnostic disable-next-line: missing-fields
-  require('nvim-treesitter.configs').setup {
-    -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = {
-      'c',
-      'cpp',
-      'csv',
-      'dockerfile',
-      'gitignore',
-      'go',
-      'lua',
-      'python',
-      'ninja',
-      'rst',
-      'rust',
-      'tsx',
-      'javascript',
-      'typescript',
-      'vimdoc',
-      'vim',
-      'bash',
-      'markdown',
-      'dockerfile',
-      'json5',
-      'php',
-      'sql',
-      'yaml',
-    },
-
-    -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
-    auto_install = true,
-
-    highlight = { enable = true },
-    indent = { enable = true },
-    incremental_selection = {
-      enable = true,
-      keymaps = {
-        init_selection = '<c-space>',
-        node_incremental = '<c-space>',
-        scope_incremental = '<c-s>',
-        node_decremental = '<M-space>',
-      },
-    },
-    textobjects = {
-      select = {
-        enable = true,
-        lookahead = true,
-        keymaps = {
-          -- You can use the capture groups defined in textobjects.scm
-          ['aa'] = '@parameter.outer',
-          ['ia'] = '@parameter.inner',
-          ['af'] = '@function.outer',
-          ['if'] = '@function.inner',
-          ['ac'] = '@class.outer',
-          ['ic'] = '@class.inner',
-        },
-      },
-      move = {
-        enable = true,
-        set_jumps = true, -- whether to set jumps in the jumplist
-        goto_next_start = {
-          [']m'] = '@function.outer',
-          [']]'] = '@class.outer',
-        },
-        goto_next_end = {
-          [']M'] = '@function.outer',
-          [']['] = '@class.outer',
-        },
-        goto_previous_start = {
-          ['[m'] = '@function.outer',
-          ['[['] = '@class.outer',
-        },
-        goto_previous_end = {
-          ['[M'] = '@function.outer',
-          ['[]'] = '@class.outer',
-        },
-      },
-      -- swap = {
-      --   enable = true,
-      --   swap_next = {
-      --     ['<leader>a'] = '@parameter.inner',
-      --   },
-      --   swap_previous = {
-      --     ['<leader>A'] = '@parameter.inner',
-      --   },
-      -- },
-    },
-  }
-end, 0)
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

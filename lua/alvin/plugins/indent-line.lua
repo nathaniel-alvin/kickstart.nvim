@@ -4,21 +4,24 @@ return {
     -- Enable `lukas-reineke/indent-blankline.nvim`
     -- See `:help ibl`
     main = 'ibl',
+    ---@module "ibl"
+    ---@type ibl.config
     config = function()
       local api = vim.api
 
       local exclude_ft = { 'help', 'git', 'markdown', 'snippets', 'text', 'gitconfig', 'alpha', 'dashboard' }
 
       require('ibl').setup {
-        indent = {
-          -- -- U+2502 may also be a good choice, it will be on the middle of cursor.
-          -- -- U+250A is also a good choice
-          char = '▏',
-        },
+        -- -- U+2502 may also be a good choice, it will be on the middle of cursor.
+        -- -- U+250A is also a good choice
+        indent = { char = { '|' }, smart_indent_cap = true },
         scope = {
           show_start = false,
           show_end = false,
         },
+      }
+
+      require('ibl').overwrite {
         exclude = {
           filetypes = exclude_ft,
           buftypes = { 'terminal' },

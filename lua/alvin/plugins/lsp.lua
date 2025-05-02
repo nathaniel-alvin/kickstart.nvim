@@ -131,6 +131,20 @@ return {
         },
       },
       pyright = true,
+      -- basedpyright = {
+      --   settings = {
+      --     pyright = {
+      --       disableOrganizeImports = true,
+      --     },
+      --     python = {
+      --       analysis = {
+      --         ignore = { '*' },
+      --         typeCheckingMode = 'standard',
+      --       },
+      --     },
+      --   },
+      -- },
+      -- ruff = true,
       jsonls = {
         -- lazy-load schemastore when needed
         on_new_config = function(new_config)
@@ -199,6 +213,9 @@ return {
       intelephense = {
         enabled = true,
       },
+      bashls = {
+        filetypes = { 'sh', 'zsh' },
+      },
     }
 
     local servers_to_install = vim.tbl_filter(function(key)
@@ -249,9 +266,10 @@ return {
     }
 
     vim.api.nvim_create_autocmd('LspAttach', {
-      callback = function(args)
-        local bufnr = args.buf
-        local client = assert(vim.lsp.get_client_by_id(args.data.client_id), 'must have valid client')
+      group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
+      callback = function(event)
+        local bufnr = event.buf
+        local client = assert(vim.lsp.get_client_by_id(event.data.client_id), 'must have valid client')
 
         local settings = servers[client.name]
         if type(settings) ~= 'table' then
@@ -263,13 +281,17 @@ return {
         vim.opt_local.omnifunc = 'v:lua.vim.lsp.omnifunc'
         vim.keymap.set('n', 'gd', builtin.lsp_definitions, { buffer = 0 })
         vim.keymap.set('n', 'gr', builtin.lsp_references, { buffer = 0 })
-        vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer = 0 })
         vim.keymap.set('n', 'gI', builtin.lsp_implementations, { buffer = 0 })
+
+        -- Jump to the type of the word under your cursor.
+        --  Useful when you're not sure what type a variable is and you want to see
+        --  the definition of its *type*, not where it was *defined*.
         vim.keymap.set('n', 'gT', vim.lsp.buf.type_definition, { buffer = 0 })
         vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = 0 })
 
         vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, { buffer = 0 })
-        vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, { buffer = 0 })
+        vim.keymap.set({ 'n', 'x' }, '<space>ca', vim.lsp.buf.code_action, { buffer = 0 })
+        vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer = 0 })
 
         local filetype = vim.bo[bufnr].filetype
         if disable_semantic_tokens[filetype] then
@@ -286,6 +308,48 @@ return {
 
             client.server_capabilities[k] = v
           end
+        end
+
+        -- not used until 0.11
+        -- -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
+        -- ---@param client vim.lsp.Client
+        -- ---@param method vim.lsp.protocol.Method
+        -- ---@param bufnr? integer some lsp support methods only in specific files
+        -- ---@return boolean
+        -- local function client_supports_method(client, method, bufnr)
+        --   if vim.fn.has 'nvim-0.11' == 1 then
+        --     return client:supports_method(method, bufnr)
+        --   else
+        --     return client.supports_method(method, { bufnr = bufnr })
+        --   end
+        -- end
+
+        -- The following two autocommands are used to highlight references of the
+        -- word under your cursor when your cursor rests there for a little while.
+        --    See `:help CursorHold` for information about when this is executed
+        --
+        -- When you move your cursor, the highlights will be cleared (the second autocommand).
+        if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight, { bufnr = bufnr }) then
+          local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
+          vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+            buffer = event.buf,
+            group = highlight_augroup,
+            callback = vim.lsp.buf.document_highlight,
+          })
+
+          vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+            buffer = event.buf,
+            group = highlight_augroup,
+            callback = vim.lsp.buf.clear_references,
+          })
+
+          vim.api.nvim_create_autocmd('LspDetach', {
+            group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
+            callback = function(event2)
+              vim.lsp.buf.clear_references()
+              vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
+            end,
+          })
         end
       end,
     })

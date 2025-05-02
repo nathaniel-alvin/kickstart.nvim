@@ -32,7 +32,8 @@ vim.keymap.set({ 'n', 'v' }, '<leader>d', [["_d]])
 vim.keymap.set('i', '<C-c>', '<Esc>')
 
 vim.keymap.set('n', 'Q', '<nop>')
-vim.keymap.set('n', '<leader>f', vim.lsp.buf.format)
+-- Currently using conform to format
+-- vim.keymap.set('n', '<leader>f', vim.lsp.buf.format)
 
 vim.keymap.set('n', '<C-k>', '<cmd>cnext<CR>zz')
 vim.keymap.set('n', '<C-j>', '<cmd>cprev<CR>zz')
@@ -41,8 +42,6 @@ vim.keymap.set('n', '<leader>j', '<cmd>lprev<CR>zz')
 
 vim.keymap.set('n', '<leader>sr', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = 'Search and Replace current word' })
 -- vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
-
-vim.keymap.set('n', '<leader>mr', '<cmd>CellularAutomaton make_it_rain<CR>')
 
 vim.keymap.set('n', '<leader><leader>', function()
   vim.cmd 'so'
@@ -56,6 +55,7 @@ local diagnostic_goto = function(next, severity)
     go { severity = severity }
   end
 end
+
 vim.keymap.set('n', '<leader>cd', vim.diagnostic.open_float, { desc = 'Line Diagnostics' })
 vim.keymap.set('n', ']d', diagnostic_goto(true), { desc = 'Next Diagnostic' })
 vim.keymap.set('n', '[d', diagnostic_goto(false), { desc = 'Prev Diagnostic' })
