@@ -52,7 +52,7 @@ return {
           enabled = true,
           module = 'blink.cmp.sources.lsp',
           kind = 'LSP',
-          min_keyword_length = 2,
+          -- min_keyword_length = 2,
           -- When linking markdown notes, I would get snippets and text in the
           -- suggestions, I want those to show only if there are no LSP
           -- suggestions
@@ -84,9 +84,9 @@ return {
         buffer = {
           name = 'Buffer',
           enabled = true,
-          max_items = 3,
+          max_items = 4,
           module = 'blink.cmp.sources.buffer',
-          min_keyword_length = 2,
+          min_keyword_length = 4,
           score_offset = 15, -- the higher the number, the higher the priority
         },
         -- snippets = {
@@ -157,7 +157,6 @@ return {
         -- cp /usr/share/dict/words ~/github/dotfiles-latest/dictionaries/words.txt
         --
         -- NOTE: For the word definitions make sure "wn" is installed
-        -- brew install wordnet
         dictionary = {
           module = 'blink-cmp-dictionary',
           name = 'Dict',
@@ -214,7 +213,7 @@ return {
     opts.completion = {
       accept = {
         auto_brackets = {
-          enabled = true,
+          enabled = false,
           default_brackets = { ';', '' },
           override_brackets_for_filetypes = {
             markdown = { ';', '' },
@@ -265,8 +264,8 @@ return {
     -- https://cmp.saghen.dev/configuration/keymap.html#default
     opts.keymap = {
       preset = 'default',
-      ['<Tab>'] = { 'snippet_forward', 'fallback' },
-      ['<S-Tab>'] = { 'snippet_backward', 'fallback' },
+      ['<C-k>'] = { 'snippet_forward', 'fallback' },
+      ['<C-j>'] = { 'snippet_backward', 'fallback' },
 
       ['<Up>'] = { 'select_prev', 'fallback' },
       ['<Down>'] = { 'select_next', 'fallback' },
@@ -276,8 +275,9 @@ return {
       ['<S-k>'] = { 'scroll_documentation_up', 'fallback' },
       ['<S-j>'] = { 'scroll_documentation_down', 'fallback' },
 
-      ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
+      ['<C-i>'] = { 'show', 'show_documentation', 'hide_documentation' },
       ['<C-e>'] = { 'hide', 'fallback' },
+      ['<C-c>'] = { 'cancel' },
     }
 
     return opts
