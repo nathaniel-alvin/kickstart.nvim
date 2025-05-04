@@ -1,29 +1,25 @@
 return {
   'neovim/nvim-lspconfig',
   dependencies = {
-    'folke/neodev.nvim',
+    'saghen/blink.cmp',
     'williamboman/mason.nvim',
     'williamboman/mason-lspconfig.nvim',
     'WhoIsSethDaniel/mason-tool-installer.nvim',
 
     { 'j-hui/fidget.nvim', opts = {} },
   },
-  config = function()
-    require('neodev').setup {
-      -- library = {
-      --   plugins = { "nvim-dap-ui" },
-      --   types = true,
-      -- },
-    }
-
-    local capabilities = nil
-    if pcall(require, 'cmp_nvim_lsp') then
-      capabilities = require('cmp_nvim_lsp').default_capabilities()
-    end
-
-    local lspconfig = require 'lspconfig'
-
-    local servers = {
+  opts = {
+    ensure_installed = {
+      'stylua',
+      'lua_ls',
+      'delve',
+      'prettier',
+      'hadolint',
+      'phpcs',
+      'php-cs-fixer',
+      -- "tailwind-language-server",
+    },
+    servers = {
       -- clangd = {},
       gopls = {
         filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
@@ -50,7 +46,6 @@ return {
               rangeVariableTypes = true,
             },
             analyses = {
-              fieldalignment = true,
               nilness = true,
               unusedparams = true,
               unusedwrite = true,
@@ -216,39 +211,46 @@ return {
       bashls = {
         filetypes = { 'sh', 'zsh' },
       },
-    }
+    },
+    disable_semantic_tokens = {
+      lua = true,
+    },
+  },
 
+  config = function(_, opts)
+    local lspconfig = require 'lspconfig'
+    local mason = require 'mason'
+    local mason_tool_installer = require 'mason-tool-installer'
+    local cmp = require 'blink.cmp'
+
+    local capabilities = cmp.get_lsp_capabilities and cmp.get_lsp_capabilities() or cmp.default_capabilities()
+
+    -- adds all the servers names in the server table and add them to servers to install
+    -- to exclude:
+    -- html = { manual_install = true } -- explicitly opted out of auto-install
+    --jsonls = false -- falsy value
     local servers_to_install = vim.tbl_filter(function(key)
-      local t = servers[key]
+      local t = opts.servers[key]
       if type(t) == 'table' then
         return not t.manual_install
       else
         return t
       end
-    end, vim.tbl_keys(servers))
+    end, vim.tbl_keys(opts.servers))
 
-    require('mason').setup()
-    local ensure_installed = {
-      'stylua',
-      'lua_ls',
-      'delve',
-      'prettier',
-      'hadolint',
-      'phpcs',
-      'php-cs-fixer',
-      -- "tailwind-language-server",
-    }
+    vim.list_extend(opts.ensure_installed, servers_to_install)
 
-    vim.list_extend(ensure_installed, servers_to_install)
-    require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+    mason.setup()
+    mason_tool_installer.setup { ensure_installed = opts.ensure_installed }
 
-    for name, config in pairs(servers) do
+    for name, config in pairs(opts.servers) do
       if config == true then
         config = {}
       end
-      config = vim.tbl_deep_extend('force', {}, {
-        capabilities = capabilities,
-      }, config)
+      -- config = vim.tbl_deep_extend('force', {}, {
+      --   capabilities = capabilities,
+      -- }, config)
+      config.capabilities = capabilities
 
       if name == 'tsserver' then
         name = 'ts_ls'
@@ -261,31 +263,18 @@ return {
     --   capabilities = capabilities,
     -- })
 
-    local disable_semantic_tokens = {
-      lua = true,
-    }
-
     vim.api.nvim_create_autocmd('LspAttach', {
       group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
       callback = function(event)
         local bufnr = event.buf
         local client = assert(vim.lsp.get_client_by_id(event.data.client_id), 'must have valid client')
 
-        local settings = servers[client.name]
-        if type(settings) ~= 'table' then
-          settings = {}
-        end
+        -- local settings = servers[client.name]
+        -- if type(settings) ~= 'table' then
+        --   settings = {}
+        -- end
+        local settings = opts.servers[client.name] or {}
 
-        local builtin = require 'telescope.builtin'
-
-        vim.opt_local.omnifunc = 'v:lua.vim.lsp.omnifunc'
-        vim.keymap.set('n', 'gd', builtin.lsp_definitions, { buffer = 0 })
-        vim.keymap.set('n', 'gr', builtin.lsp_references, { buffer = 0 })
-        vim.keymap.set('n', 'gI', builtin.lsp_implementations, { buffer = 0 })
-
-        -- Jump to the type of the word under your cursor.
-        --  Useful when you're not sure what type a variable is and you want to see
-        --  the definition of its *type*, not where it was *defined*.
         vim.keymap.set('n', 'gT', vim.lsp.buf.type_definition, { buffer = 0 })
         vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = 0 })
 
@@ -293,8 +282,7 @@ return {
         vim.keymap.set({ 'n', 'x' }, '<space>ca', vim.lsp.buf.code_action, { buffer = 0 })
         vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer = 0 })
 
-        local filetype = vim.bo[bufnr].filetype
-        if disable_semantic_tokens[filetype] then
+        if opts.disable_semantic_tokens[vim.bo[bufnr].filetype] then
           client.server_capabilities.semanticTokensProvider = nil
         end
 
@@ -309,20 +297,6 @@ return {
             client.server_capabilities[k] = v
           end
         end
-
-        -- not used until 0.11
-        -- -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
-        -- ---@param client vim.lsp.Client
-        -- ---@param method vim.lsp.protocol.Method
-        -- ---@param bufnr? integer some lsp support methods only in specific files
-        -- ---@return boolean
-        -- local function client_supports_method(client, method, bufnr)
-        --   if vim.fn.has 'nvim-0.11' == 1 then
-        --     return client:supports_method(method, bufnr)
-        --   else
-        --     return client.supports_method(method, { bufnr = bufnr })
-        --   end
-        -- end
 
         -- The following two autocommands are used to highlight references of the
         -- word under your cursor when your cursor rests there for a little while.

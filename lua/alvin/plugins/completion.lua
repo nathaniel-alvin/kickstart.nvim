@@ -1,6 +1,7 @@
 return {
   -- Autocompletion
   'hrsh7th/nvim-cmp',
+  enabled = false,
   dependencies = {
     'onsails/lspkind.nvim',
     'hrsh7th/cmp-nvim-lsp',

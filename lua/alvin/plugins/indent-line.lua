@@ -1,49 +1,51 @@
-return {
-  { -- Add indentation guides even on blank lines
-    'lukas-reineke/indent-blankline.nvim',
-    -- Enable `lukas-reineke/indent-blankline.nvim`
-    -- See `:help ibl`
-    main = 'ibl',
-    ---@module "ibl"
-    ---@type ibl.config
-    config = function()
-      local api = vim.api
-
-      local exclude_ft = { 'help', 'git', 'markdown', 'snippets', 'text', 'gitconfig', 'alpha', 'dashboard' }
-
-      require('ibl').setup {
-        -- -- U+2502 may also be a good choice, it will be on the middle of cursor.
-        -- -- U+250A is also a good choice
-        indent = { char = { '|' }, smart_indent_cap = true },
-        scope = {
-          show_start = false,
-          show_end = false,
-        },
-      }
-
-      require('ibl').overwrite {
-        exclude = {
-          filetypes = exclude_ft,
-          buftypes = { 'terminal' },
-        },
-      }
-
-      local gid = api.nvim_create_augroup('indent_blankline', { clear = true })
-      api.nvim_create_autocmd('InsertEnter', {
-        pattern = '*',
-        group = gid,
-        command = 'IBLDisable',
-      })
-
-      api.nvim_create_autocmd('InsertLeave', {
-        pattern = '*',
-        group = gid,
-        callback = function()
-          if not vim.tbl_contains(exclude_ft, vim.bo.filetype) then
-            vim.cmd [[IBLEnable]]
-          end
-        end,
-      })
-    end,
-  },
-}
+return {}
+-- return {
+--   { -- Add indentation guides even on blank lines
+--     'lukas-reineke/indent-blankline.nvim',
+--     enable = false,
+--     -- Enable `lukas-reineke/indent-blankline.nvim`
+--     -- See `:help ibl`
+--     main = 'ibl',
+--     ---@module "ibl"
+--     ---@type ibl.config
+--     config = function()
+--       local api = vim.api
+--
+--       local exclude_ft = { 'help', 'git', 'markdown', 'snippets', 'text', 'gitconfig', 'alpha', 'dashboard' }
+--
+--       require('ibl').setup {
+--         -- -- U+2502 may also be a good choice, it will be on the middle of cursor.
+--         -- -- U+250A is also a good choice
+--         indent = { char = { '|' }, smart_indent_cap = true },
+--         scope = {
+--           show_start = false,
+--           show_end = false,
+--         },
+--       }
+--
+--       require('ibl').overwrite {
+--         exclude = {
+--           filetypes = exclude_ft,
+--           buftypes = { 'terminal' },
+--         },
+--       }
+--
+--       local gid = api.nvim_create_augroup('indent_blankline', { clear = true })
+--       api.nvim_create_autocmd('InsertEnter', {
+--         pattern = '*',
+--         group = gid,
+--         command = 'IBLDisable',
+--       })
+--
+--       api.nvim_create_autocmd('InsertLeave', {
+--         pattern = '*',
+--         group = gid,
+--         callback = function()
+--           if not vim.tbl_contains(exclude_ft, vim.bo.filetype) then
+--             vim.cmd [[IBLEnable]]
+--           end
+--         end,
+--       })
+--     end,
+--   },
+-- }
